@@ -52,8 +52,8 @@
             border-radius: 6px;
             background: #f8f9fa;
             display: grid;
-            grid-template-columns: 1fr 1fr 1.2fr auto auto;
-            gap: 12px;
+            grid-template-columns: 1fr 2fr auto auto;
+            gap: 15px;
             align-items: center;
         }
         .total-box-container {
@@ -72,7 +72,7 @@
             margin-bottom: 5px;
             text-transform: uppercase;
         }
-        .control-group input, .control-group select {
+        .control-group input {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
@@ -80,7 +80,7 @@
             font-size: 13px;
         }
         .btn {
-            padding: 8px 15px;
+            padding: 8px 20px;
             background: #007bff;
             color: white;
             border: none;
@@ -140,7 +140,7 @@
         <a href="/dashboard.html" class="back-link">← ត្រឡប់ទៅ Main Menu</a>
     </div>
 
-    <!-- ផ្នែក Search From Date, To Date, Size និង Total -->
+    <!-- ផ្នែក Search From Date និង Total -->
     <div class="search-section">
         <div class="search-box">
             <div class="control-group">
@@ -150,15 +150,6 @@
             <div class="control-group">
                 <label>TO DATE</label>
                 <input type="date" id="txtToDate">
-            </div>
-            <div class="control-group">
-                <label>SIZE</label>
-                <select id="txtSize">
-                    <option value="">-- ALL SIZES --</option>
-                    <option value="20">20</option>
-                    <option value="40">40</option>
-                    <option value="45">45</option>
-                </select>
             </div>
             <button class="btn" onclick="searchByDate()">SEARCH</button>
             <button class="btn btn-close" onclick="window.location.href='/dashboard.html'">CLOSE</button>
@@ -196,9 +187,10 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 8]
+    const API_BASE = window.location.origin;
 
-    // 🟢 មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log
+    // 🟢 មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log[cite: 13]
     async function logUserActivity(action, module, containerNo, description) {
         let userName = localStorage.getItem("currentUser") || "System";
         let fullName = localStorage.getItem("currentUserFullName") || userName;
@@ -224,7 +216,6 @@
     async function searchByDate() {
         let fromDate = document.getElementById('txtFromDate').value;
         let toDate = document.getElementById('txtToDate').value;
-        let size = document.getElementById('txtSize').value;
 
         if (!fromDate || !toDate) {
             alert("Please select both From Date and To Date!");
@@ -233,10 +224,6 @@
 
         try {
             let url = `${API_BASE}/api/containers?from_date=${fromDate}&to_date=${toDate}`;
-            if (size) {
-                url += `&size=${size}`;
-            }
-
             let res = await fetch(url);
             let json = await res.json();
 
@@ -267,14 +254,13 @@
 
             document.getElementById('txtTotal').innerText = rCount;
             
-            // 🟢 ហៅកត់ត្រាចូល Activity Log ពេលធ្វើការស្វែងរក
-            let logDesc = `Searched containers from ${fromDate} to ${toDate}${size ? ' with Size: ' + size : ''}, found ${rCount} records`;
-            await logUserActivity("SEARCH_DATE", "CONTAINER_DATE_IN", "", logDesc);
+            // 🟢 ហៅកត់ត្រាចូល Activity Log ពេលធ្វើការស្វែងរកតាមកាលបរិច្ឆេទ[cite: 13]
+            await logUserActivity("SEARCH_DATE", "CONTAINER_DATE_IN", "", `Searched containers from ${fromDate} to ${toDate}, found ${rCount} records`);
 
             if (rCount > 0) {
-                alert(`Data loaded successfully! Total: ${rCount} containers.`);
+                alert(`Data loaded successfully! Total: ${rCount} containers.`);[cite: 13]
             } else {
-                alert("No data found for the selected criteria!");
+                alert("No data found for the selected date range!");
             }
 
         } catch (err) {
