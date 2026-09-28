@@ -44,7 +44,6 @@
         }
         .back-link:hover { text-decoration: underline; }
 
-        /* Header Logo & Title */
         .header-section {
             text-align: center;
             margin-bottom: 20px;
@@ -187,7 +186,9 @@
 </div>
 
 <script>
-    const API_BASE = window.location.origin;[cite: 22]
+    // 🔴 ចំណាំ៖ បើសិនជា Frontend និង Backend នៅដាច់ Server គ្នា (ต่าง Domain) 
+    // សូមប្តូរ const API_BASE ខាងក្រោមឱ្យចំ URL របស់ Backend របស់អ្នក (ឧ. https://your-backend.onrender.com)
+    const API_BASE = window.location.origin.includes("localhost") ? "http://localhost:5000" : window.location.origin;
 
     async function logUserActivity(action, module, containerNo, description) {
         let userName = localStorage.getItem("currentUser") || "System";
@@ -265,7 +266,6 @@
 
         if (!strPass) {
             alert("Please enter Password!");
-            document.getElementById('txtPassworld').value.trim();
             document.getElementById('txtPassworld').focus();
             return;
         }
@@ -276,31 +276,35 @@
             return;
         }
 
+        let payload = {
+            username: strUser,
+            password: strPass,
+            role: strRole,
+            shipping_line: strShippingLine,
+            full_name: strFullName,
+            active: strActive
+        };
+
         try {
+            console.log("Sending request to:", `${API_BASE}/api/users`);
             let res = await fetch(`${API_BASE}/api/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: strUser,
-                    password: strPass,
-                    role: strRole,
-                    shipping_line: strShippingLine,
-                    full_name: strFullName,
-                    active: strActive
-                })
+                body: JSON.stringify(payload)
             });
 
-            if (res.status === 201 || res.status === 200 || res.ok) {
-                alert("Data saved to Cloud Database successfully!");[cite: 22]
+            let resultJson = await res.json().catch(() => ({}));
+
+            if (res.ok || res.status === 201) {
+                alert("Data saved to Cloud Database successfully!");
                 await logUserActivity("ADD_USER", "USER_MANAGEMENT", "", `Created new user account: ${strUser} (Role: ${strRole}, Line: ${strShippingLine})`);
                 clearFields();
             } else {
-                let errText = await res.text();
-                alert("Failed to save to Cloud: " + errText);[cite: 22]
+                alert("Failed to save to Cloud: " + (resultJson.message || resultJson.error || "Unknown error"));
             }
         } catch (err) {
             console.error("Error saving user:", err);
-            alert("Connection Error: " + err.message);[cite: 22]
+            alert("Connection Error: " + err.message + "\nសូមពិនិត្យមើលការតភ្ជាប់ Server ឬ CORS ជាថ្មី!");
         }
     });
 </script>
