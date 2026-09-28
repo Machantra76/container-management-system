@@ -169,7 +169,6 @@
         </div>
         <div class="top-actions">
             <span id="lblUserRole" style="font-size: 14px; font-weight: bold;">Role: User</span>
-            <!-- 🟢 ប៊ូតុង Account មាន ID សម្រាប់ងាយស្រួលគ្រប់គ្រងការ Disable -->
             <button class="action-btn" id="btnAccount" onclick="openAccountModal()">⚙️ Account</button>
             <button class="action-btn" onclick="logout()">🚪 Logout</button>
         </div>
@@ -237,7 +236,7 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    const API_BASE = window.location.origin;
 
     window.onload = function() {
         let currentRole = (localStorage.getItem("currentUserRole") || localStorage.getItem("role") || "User").trim().toLowerCase();
@@ -251,16 +250,13 @@
             document.getElementById("boxClearData").style.display = "none";
             document.getElementById("boxAdminSection").style.display = "none";
 
-            // 🟢 បិទប៊ូតុង Account មិនឱ្យចុចសម្រាប់ Shipping Line
             let btnAcc = document.getElementById("btnAccount");
             if(btnAcc) btnAcc.disabled = true;
 
-            // 🟢 បិទមុខងារដទៃទៀតដែលមិនពាក់ព័ន្ធ
             document.getElementById("btnContainerStockIn").disabled = true;
             document.getElementById("btnContainerRepair").disabled = true;
             document.getElementById("btnContainerDateIn").disabled = true;
 
-            // 🟢 បើកឱ្យប្រើប្រាស់បានតែ ២ នេះគត់
             document.getElementById("btnContainerShippingLine").disabled = false;
             document.getElementById("btnReportContainerRepair").disabled = false;
         }
