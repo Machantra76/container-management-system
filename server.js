@@ -40,6 +40,24 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
+// 🟢 មុខងារបង្កើត Admin ស្វ័យប្រវត្តិ
+async function createDefaultAdmin() {
+    try {
+        const checkAdmin = await pool.query("SELECT * FROM users WHERE username = 'admin'");
+        if (checkAdmin.rows.length === 0) {
+            await pool.query(
+                `INSERT INTO users (username, password, role, full_name, active) 
+                 VALUES ('admin', 'admin123', 'Admin', 'System Administrator', 'Active')`,
+            );
+            console.log("✅ Default Admin account created successfully! (Username: admin, Password: admin123)");
+        } else {
+            console.log("ℹ️ Admin account already exists.");
+        }
+    } catch (err) {
+        console.error("Error creating default admin:", err);
+    }
+}
+
 async function initDB() {
     try {
         await pool.query(`
@@ -140,6 +158,10 @@ async function initDB() {
         `);
 
         console.log("Database initialized successfully with Location and Full Name support!");
+
+        // 🟢 ហៅដំណើរការបង្កើត Admin បន្ទាប់ពី Database រៀបចំរួចរាល់
+        await createDefaultAdmin();
+
     } catch (err) {
         console.error("DB Init Error:", err);
     }
@@ -152,6 +174,8 @@ initDB();
 app.delete('/api/reset-database', async (req, res) => {
     try {
         await pool.query('TRUNCATE TABLE container_repair, container_stock, shipping_lines, locations, activity_log, users RESTART IDENTITY CASCADE;');
+        // បង្កើត Admin ឡើងវិញក្រោយពេល Reset សម្រេច
+        await createDefaultAdmin();
         res.status(200).json({ 
             status: "Success", 
             message: "All database tables cleared and IDs reset successfully!" 
