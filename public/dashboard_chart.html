@@ -212,7 +212,8 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 8]
+    const API_BASE = window.location.origin;
 
     window.onload = async () => {
         await loadDashboardData();
@@ -236,7 +237,7 @@
             let repairRes = await resRepairReport.json();
             let repairs = Array.isArray(repairRes) ? repairRes : (repairRes.data || []);
 
-            // បង្ហាញតម្លៃសរុបទៅក្នុង Cards
+            // បង្ហាញតម្លៃសរុបទៅក្នុង Cards[cite: 14]
             let lblUsers = document.getElementById('lblTotalUsers');
             if (lblUsers) lblUsers.innerText = users.length;
             
@@ -255,10 +256,10 @@
             let lblRepair = document.getElementById('lblTotalRepair');
             if (lblRepair) lblRepair.innerText = repairs.length;
 
-            // បំពេញតារាងលម្អិតតាម Size និង Shipping Line
+            // បំពេញតារាងលម្អិតតាម Size និង Shipping Line[cite: 14]
             populateTables(stockIn, repairs);
 
-            // រៀបចំក្រាហ្វទំនើប
+            // រៀបចំក្រាហ្វទំនើប[cite: 14]
             processCharts(logs, stockIn);
 
         } catch (err) {
@@ -346,7 +347,7 @@
             'rgba(255, 206, 86, 1)'
         ];
 
-        // 1. Modern Bar Chart (Action Breakdown)
+        // 1. Modern Bar Chart (Action Breakdown)[cite: 14]
         const ctxActionEl = document.getElementById('actionChart');
         if (ctxActionEl) {
             const ctxAction = ctxActionEl.getContext('2d');
@@ -383,7 +384,7 @@
             });
         }
 
-        // 2. Modern Doughnut Chart (Size Breakdown)
+        // 2. Modern Doughnut Chart (Size Breakdown)[cite: 14]
         const ctxSizeEl = document.getElementById('sizeChart');
         if (ctxSizeEl) {
             const ctxSize = ctxSizeEl.getContext('2d');
