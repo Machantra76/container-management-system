@@ -93,6 +93,9 @@
 </div>
 
 <script>
+    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 8]
+    const API_BASE = window.location.origin;
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -102,7 +105,7 @@
 
         if (username !== "" && password !== "") {
             try {
-                let response = await fetch("https://my-accesses-api.onrender.com/api/login", {
+                let response = await fetch(`${API_BASE}/api/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ username: username, password: password })
@@ -115,14 +118,14 @@
                     let userRole = userData.role || "User";
                     let userFullName = userData.full_name || userData.username; 
                     
-                    // 🟢 ទាញយកឈ្មោះ Shipping Line ពី Database (ផ្អែកលើ Field ក្នុង Database របស់អ្នក ឧ. shipping_line ឬ company_name)
+                    // 🟢 ទាញយកឈ្មោះ Shipping Line ពី Database (ផ្អែកលើ Field ក្នុង Database របស់អ្នក ឧ. shipping_line ឬ company_name)[cite: 9]
                     let shippingLineName = userData.shipping_line || userData.company_name || userData.username;
 
-                    // រក្សាទុកទិន្នន័យក្នុង localStorage យ៉ាងពេញលេញរួមទាំង Shipping Line
+                    // រក្សាទុកទិន្នន័យក្នុង localStorage យ៉ាងពេញលេញរួមទាំង Shipping Line[cite: 9]
                     localStorage.setItem('currentUser', userData.username);
                     localStorage.setItem('currentUserFullName', userFullName); 
                     localStorage.setItem('currentUserRole', userRole);
-                    localStorage.setItem('shippingLine', shippingLineName); // 👈 រក្សាទុកឈ្មោះក្រុមហ៊ុននាវាសម្រាប់យកទៅ Filter
+                    localStorage.setItem('shippingLine', shippingLineName); // 👈 រក្សាទុកឈ្មោះក្រុមហ៊ុននាវាសម្រាប់យកទៅ Filter[cite: 9]
 
                     alert("Login successful!");
                     window.location.href = "dashboard.html";
