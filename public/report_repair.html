@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>REPORT CONTAINER REPAIR</title>
-    <!-- Include jsPDF and jsPDF-AutoTable for PDF Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <!-- Include Google Fonts for Khmer & English (Inter & Battambang) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Battambang:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -178,14 +176,10 @@
             z-index: 10;
         }
 
-        tbody tr {
-            transition: background-color 0.15s ease;
-        }
+        tbody tr { transition: background-color 0.15s ease; }
         tbody tr:nth-child(even) { background-color: #fbfcfd; }
         tbody tr:hover { background-color: #eff6ff; cursor: pointer; }
-        tbody tr.selected {
-            background-color: #dbeafe !important;
-        }
+        tbody tr.selected { background-color: #dbeafe !important; }
 
         .loading {
             text-align: center;
@@ -194,7 +188,6 @@
             color: var(--text-muted);
         }
 
-        /* Modal Popup Style */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -308,7 +301,6 @@
     </div>
 </div>
 
-<!-- Modal Popup -->
 <div class="modal-overlay" id="editStatusModal">
     <div class="modal-box">
         <h3>កែប្រែស្ថានភាព (Edit Status)</h3>
@@ -325,7 +317,7 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    const API_BASE = window.location.origin;
     let rawRepairList = [];
     let currentFilteredList = [];
     let selectedRowData = null;
@@ -333,49 +325,41 @@
 
     window.onload = function() {
         loadContainerRepairData();
-        applyShippingRoleRestrictions(); // 🟢 ពិនិត្យសិទ្ធិ Role ពេលផ្ទុកទំព័រ
+        applyShippingRoleRestrictions();
     };
 
-    // 🟢 មុខងារត្រួតពិនិត្យសិទ្ធិសម្រាប់ Role = shipping_line
     function applyShippingRoleRestrictions() {
         let currentRole = (localStorage.getItem("currentUserRole") || "").trim().toLowerCase();
         let currentShippingLineUser = localStorage.getItem("currentShippingLine") || localStorage.getItem("currentUser") || "";
 
         if (currentRole === "shipping_line" || currentRole === "shipping") {
-            // ១. បិទប៊ូតុង COMPLETE
             let btnComplete = document.getElementById('btnComplete');
             if (btnComplete) {
                 btnComplete.disabled = true;
                 btnComplete.style.backgroundColor = "#6c757d";
                 btnComplete.style.cursor = "not-allowed";
-                btnComplete.title = "Restricted for Shipping Line role";
             }
 
-            // ២. បិទប៊ូតុង EDIT STATUS
             let btnEditStatus = document.getElementById('btnEditStatus');
             if (btnEditStatus) {
                 btnEditStatus.disabled = true;
                 btnEditStatus.style.backgroundColor = "#6c757d";
                 btnEditStatus.style.cursor = "not-allowed";
-                btnEditStatus.title = "Restricted for Shipping Line role";
             }
 
-            // ៣. បិទប៊ូតុង DELETE
             let btnDelete = document.getElementById('btnDelete');
             if (btnDelete) {
                 btnDelete.disabled = true;
                 btnDelete.style.backgroundColor = "#6c757d";
                 btnDelete.style.cursor = "not-allowed";
-                btnDelete.title = "Restricted for Shipping Line role";
             }
 
-            // ៤. លាក់ ឬล็อក Dropdown Shipping Line តាមគណនីផ្ទាល់ខ្លួនបើសمស្រប
             let ddlLine = document.getElementById('ddlShippingLine');
             if (currentShippingLineUser && currentShippingLineUser !== "Admin" && ddlLine) {
                 for (let opt of ddlLine.options) {
                     if (opt.value.toUpperCase() === currentShippingLineUser.toUpperCase()) {
                         ddlLine.value = opt.value;
-                        ddlLine.disabled = true; // ล็อកមិនឱ្យដូរមើលរបស់ក្រុមហ៊ុនដទៃ
+                        ddlLine.disabled = true;
                         filterContainerData();
                         break;
                     }
@@ -444,9 +428,7 @@
         let lines = new Set();
         dataList.forEach(item => {
             let line = item.shipping_line || item.SHIPPING_LINE || item.ShippingLine || "";
-            if (line.trim() !== "") {
-                lines.add(line.trim());
-            }
+            if (line.trim() !== "") lines.add(line.trim());
         });
 
         Array.from(lines).sort().forEach(line => {
@@ -496,16 +478,13 @@
                 if (isCompleted && rawCompleteDate) {
                     let cDate = new Date(rawCompleteDate);
                     cDate.setHours(0, 0, 0, 0);
-                    if (!isNaN(cDate.getTime())) {
-                        endDate = cDate; 
-                    }
+                    if (!isNaN(cDate.getTime())) endDate = cDate; 
                 }
 
                 if (!isNaN(rDate.getTime())) {
                     let diffTime = endDate - rDate;
                     let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     let baseDays = diffDays >= 0 ? diffDays : 0;
-
                     let frozenDays = parseInt(item.frozen_days || item.FROZEN_DAYS || 0);
                     
                     if (!isCompleted && frozenDays > 0) {
@@ -514,7 +493,6 @@
                         reDate.setHours(0, 0, 0, 0);
                         let today = new Date();
                         today.setHours(0, 0, 0, 0);
-
                         let extraDiff = Math.floor((today - reDate) / (1000 * 60 * 60 * 24));
                         dayInRepair = frozenDays + (extraDiff >= 0 ? extraDiff : 0);
                     } else {
@@ -534,7 +512,6 @@
             let rawActCost = item.act_cost || item.ACT_COST || item.ActCost || 0;
             let estCost = rawEstCost !== "" && !isNaN(rawEstCost) ? `$${parseFloat(rawEstCost).toFixed(2)}` : "";
             let actCost = rawActCost !== "" && !isNaN(rawActCost) ? `$${parseFloat(rawActCost).toFixed(2)}` : "";
-
             let remark = item.remark || item.REMARK || item.Remark || "";
 
             let tr = document.createElement("tr");
@@ -577,10 +554,8 @@
         currentFilteredList = rawRepairList.filter(item => {
             let containerNo = (item.container_no || item.CONTAINER_No || item.ContainerNo || item.CONTAINER_NO || "").toString().toLowerCase();
             let shippingLine = (item.shipping_line || item.SHIPPING_LINE || item.ShippingLine || "").toString().toLowerCase();
-
             let matchKeyword = !keyword || containerNo.includes(keyword);
             let matchLine = !selectedLine || shippingLine === selectedLine;
-
             return matchKeyword && matchLine;
         });
 
@@ -666,9 +641,7 @@
                 })
             });
 
-            if (resRepair.ok || resContainer.ok) {
-                success = true;
-            }
+            if (resRepair.ok || resContainer.ok) success = true;
         } catch (err) {
             console.log("Error updating edit status:", err);
         }
@@ -680,7 +653,7 @@
             await logUserActivity("EDIT_STATUS", "CONTAINER_REPAIR", containerNo, `Changed status to ${newStatus} with frozen days ${frozenDays}`);
             loadContainerRepairData();
         } else {
-            alert("មិនអាចរក្សាទុកការកែប្រែបានទេ! សូមពិនិត្យ Endpoint Update លើ Backend Server!");
+            alert("មិនអាចរក្សាទុកការកែប្រែได้ទេ!");
         }
     }
 
@@ -709,12 +682,9 @@
         let body = currentFilteredList.map((item, idx) => {
             let rawRepairDate = item.repair_date_in_time || item.REPAIR_DATE_IN_TIME || item.RepairDateInTime || item.repair_date || "";
             let repairDate = rawRepairDate ? String(rawRepairDate).replace("T", " ").substring(0, 10) : "";
-            
             let rawCompleteDate = item.complete_date || item.COMPLETE_DATE || item.CompleteDate || "";
             let completeDate = rawCompleteDate ? String(rawCompleteDate).replace("T", " ").substring(0, 10) : "";
-
             let dayInRepair = item.day_in_repair || item.DAY_IN_REPAIR || item.DayInRepair || "";
-
             let rawEstCost = item.est_cost || item.EST_COST || item.EstCost || 0;
             let rawActCost = item.act_cost || item.ACT_COST || item.ActCost || 0;
             let estCost = rawEstCost !== "" && !isNaN(rawEstCost) ? `$${parseFloat(rawEstCost).toFixed(2)}` : "";
@@ -784,7 +754,6 @@
         };
 
         let success = false;
-
         try {
             let resRepair = await fetch(`${API_BASE}/api/container-repairs/complete`, {
                 method: 'PUT',
@@ -802,19 +771,17 @@
                 })
             });
 
-            if (resRepair.ok || resContainer.ok) {
-                success = true;
-            }
+            if (resRepair.ok || resContainer.ok) success = true;
         } catch (err) {
             console.log("Error updating complete status:", err);
         }
 
         if (success) {
-            alert("រក្សាទុកការ Complete បានជោគជ័យ និងបានតភ្ជាប់ទៅកាន់ Shipping Line រួចរាល់!");
+            alert("រក្សាទុកការ Complete បានជោគជ័យ!");
             await logUserActivity("COMPLETE_REPAIR", "CONTAINER_REPAIR", containerNo, `Marked repair as complete for container ${containerNo}`);
             loadContainerRepairData();
         } else {
-            alert("មិនអាចរក្សាទុកបានទេ! សូមពិនិត្យ Endpoint Update លើ Backend Server!");
+            alert("មិនអាចរក្សាទុកបានទេ!");
         }
     }
 
@@ -838,9 +805,7 @@
             return;
         }
 
-        if (!confirm(`តើអ្នកប្រាកដថាចង់លុបទិន្នន័យ Repair របស់ Container [${containerNo}] នេះចេញមែនទេ?`)) {
-            return;
-        }
+        if (!confirm(`តើអ្នកប្រាកដថាចង់លុបទិន្នន័យ Repair របស់ Container [${containerNo}] នេះចេញមែនទេ?`)) return;
 
         try {
             let res = await fetch(`${API_BASE}/api/container-repairs/${repairId}`, {
@@ -860,11 +825,11 @@
                     })
                 });
 
-                alert("លុបទិន្នន័យចេញពី container_repair និងបានធ្វើបច្ចុប្បន្នភាពតារាង Shipping Line ជោគជ័យ!");
+                alert("លុបទិន្នន័យជោគជ័យ!");
                 await logUserActivity("DELETE_REPAIR", "CONTAINER_REPAIR", containerNo, `Deleted repair record for container ${containerNo}`);
                 loadContainerRepairData();
             } else {
-                alert("ការលុបបរាជ័យ: " + (resData.message || "មិនអាចលុបទិន្នន័យបានទេ"));
+                alert("การលុបបរាជ័យ: " + (resData.message || "មិនអាចលុបទិន្នន័យបានទេ"));
             }
         } catch (err) {
             console.error("Error deleting repair record:", err);
