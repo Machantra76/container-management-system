@@ -202,7 +202,8 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // ប្រើ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 1, 2, 7]
+    const API_BASE = window.location.origin;
     let containersData = [];
 
     window.onload = () => {
@@ -256,7 +257,6 @@
         }
     }
 
-    // 🟢 លក្ខខណ្ឌទី១៖ ឆែកមើលពេលជ្រើសរើសលេខទូ បើសិនជា Release មិនឱ្យចូល Repair ទេ
     function onContainerSelect() {
         let selectedNo = document.getElementById('txtContainerNo').value;
         if (!selectedNo) {
@@ -270,7 +270,7 @@
             let status = (found.status || found.STATUS || "").trim().toUpperCase();
             if (status === "RELEASE") {
                 alert(`❌ មិនអាចជ្រើសរើសបានទេ! លេខកុងតឺន័រ "${selectedNo}" នេះបានជាប់ស្ថានភាព RELEASE រួចរាល់ហើយ។`);
-                document.getElementById('txtContainerNo').value = ""; // Clear selection
+                document.getElementById('txtContainerNo').value = "";
                 clearFormFieldsOnly();
                 return;
             }
@@ -308,7 +308,6 @@
         return diffDays >= 0 ? diffDays : 0;
     }
 
-    // 🟢 លក្ខខណ្ឌទី២៖ តម្រូវឱ្យបំពេញ Text/Inputs ទាំងអស់ក្នុង Form Repair ឱ្យអស់ មុនពេល Save
     document.getElementById('repairForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -321,7 +320,6 @@
         let damageDesc = document.getElementById('txtDamageDis').value.trim();
         let remark = document.getElementById('txtRemark').value.trim();
 
-        // ត្រួតពិនិត្យក្រែងលោមាន Field ណាមួយនៅទទេ
         if (!containerNo || !repairStatus || !vendor || actCost === "" || estCost === "" || !damageType || !damageDesc || !remark) {
             alert("⚠️ សូមបំពេញព័ត៌មានទាំងអស់នៅក្នុង Form Repair ឱ្យបានគ្រប់គ្រាន់ មិនត្រូវឱ្យមានការខ្វះចន្លោះឡើយ!");
             return;
