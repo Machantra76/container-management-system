@@ -156,11 +156,10 @@
                 <option value="Operation">Operation</option>
                 <option value="Admin">Admin</option>
                 <option value="Supervisor">Supervisor</option>
-                <option value="shipping_line">Shipping Line</option> <!-- 🟢 បន្ថែមជម្រើស Shipping Line -->
+                <option value="shipping_line">Shipping Line</option>
             </select>
         </div>
 
-        <!-- 🟢 ប្រអប់បញ្ជាក់ឈ្មោះ Shipping Line (បង្ហាញពេលជ្រើសរើស Role ជា Shipping Line) -->
         <div class="form-group" id="shippingLineGroup" style="display: none;">
             <label for="txtShippingLine">SHIPPING LINE</label>
             <input type="text" id="txtShippingLine" placeholder="ឧ. HMM, SITC, MSC..." autocomplete="off">
@@ -188,7 +187,8 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // កែប្រែត្រង់ចំណុចនេះ ដើម្បីឱ្យវាទាញយករ Domain/URL តាម Web Service ដែលកំពុងបើកដំណើរការជាក់ស្តែង
+    const API_BASE = window.location.origin;
 
     async function logUserActivity(action, module, containerNo, description) {
         let userName = localStorage.getItem("currentUser") || "System";
@@ -216,7 +216,6 @@
         clearFields();
     };
 
-    // 🟢 បើក/បិទប្រអប់ Shipping Line តាម Role ដែលបានជ្រើសរើស
     function toggleShippingLineField() {
         let role = document.getElementById('cmbRole').value;
         let shippingLineGroup = document.getElementById('shippingLineGroup');
@@ -249,7 +248,6 @@
         clearFields();
     }
 
-    // ព្រឹត្តិការណ៍ពេលចុច SAVE (ផ្ញើទិន្នន័យទៅកាន់ Cloud API)
     document.getElementById('userForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -286,7 +284,7 @@
                     username: strUser,
                     password: strPass,
                     role: strRole,
-                    shipping_line: strShippingLine, // 👈 ផ្ញើឈ្មោះក្រុមហ៊ុននាវាទៅកាន់ Database
+                    shipping_line: strShippingLine,
                     full_name: strFullName,
                     active: strActive
                 })
