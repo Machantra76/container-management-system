@@ -190,7 +190,7 @@
     // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 8]
     const API_BASE = window.location.origin;
 
-    // 🟢 មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log[cite: 13]
+    // 🟢 មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log[cite: 16]
     async function logUserActivity(action, module, containerNo, description) {
         let userName = localStorage.getItem("currentUser") || "System";
         let fullName = localStorage.getItem("currentUserFullName") || userName;
@@ -254,11 +254,11 @@
 
             document.getElementById('txtTotal').innerText = rCount;
             
-            // 🟢 ហៅកត់ត្រាចូល Activity Log ពេលធ្វើការស្វែងរកតាមកាលបរិច្ឆេទ[cite: 13]
+            // 🟢 ហៅកត់ត្រាចូល Activity Log ពេលធ្វើការស្វែងរកតាមកាលបរិច្ឆេទ[cite: 16]
             await logUserActivity("SEARCH_DATE", "CONTAINER_DATE_IN", "", `Searched containers from ${fromDate} to ${toDate}, found ${rCount} records`);
 
             if (rCount > 0) {
-                alert(`Data loaded successfully! Total: ${rCount} containers.`);[cite: 13]
+                alert(`Data loaded successfully! Total: ${rCount} containers.`);[cite: 16]
             } else {
                 alert("No data found for the selected date range!");
             }
