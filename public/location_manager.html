@@ -165,10 +165,10 @@
 </div>
 
 <script>
-    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាភ្ជាប់ទៅកាន់ Server តែមួយដោយស្វ័យប្រវត្តិ[cite: 12]
+    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាភ្ជាប់ទៅកាន់ Server និង Database បច្ចុប្បន្នដោយស្វ័យប្រវត្តិ
     const API_BASE = window.location.origin;
 
-    // មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log[cite: 12]
+    // 🟢 មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log[cite: 13]
     async function logUserActivity(action, module, containerNo, description) {
         let userName = localStorage.getItem("currentUser") || "System";
         let fullName = localStorage.getItem("currentUserFullName") || userName;
@@ -191,7 +191,7 @@
         }
     }
 
-    // ទាញយកបញ្ជី Location មកបង្ហាញក្នុង Table[cite: 12]
+    // ទាញយកបញ្ជី Location មកបង្ហាញក្នុង Table[cite: 13]
     async function loadLocations() {
         try {
             let res = await fetch(`${API_BASE}/api/locations`);
@@ -200,13 +200,12 @@
             let tbody = document.querySelector('#locationTable tbody');
             tbody.innerHTML = '';
             
-            let dataList = result.data || result;
-            if (Array.isArray(dataList)) {
-                dataList.forEach((item, index) => {
+            if (result.data && Array.isArray(result.data)) {
+                result.data.forEach((item, index) => {
                     let tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${index + 1}</td>
-                        <td><b>${item.location_code || ''}</b></td>
+                        <td><b>${item.location_code}</b></td>
                         <td>${item.yard_block || ''}</td>
                         <td>${item.description || ''}</td>
                     `;
@@ -218,7 +217,7 @@
         }
     }
 
-    // រក្សាទុក Location ថ្មី[cite: 12]
+    // រក្សាទុក Location ថ្មី[cite: 13]
     document.getElementById('locationForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -233,24 +232,17 @@
                 body: JSON.stringify({ location_code, yard_block, description })
             });
 
-            // អានតម្លៃក្នុងទម្រង់ Text ជាមុនសិន ដើម្បីป้องกัน Error JSON Parsing ពេល Server ឆ្លើយតបមកជាអត្ថបទ
-            let textResponse = await res.text();
-            let data = {};
-            try {
-                data = JSON.parse(textResponse);
-            } catch (err) {
-                data = { message: textResponse };
-            }
+            let data = await res.json();
 
-            if (res.ok || res.status === 201 || res.status === 200) {
-                alert("បានរក្សាទុក Location ថ្មីជោគជ័យ!");[cite: 12]
+            if (res.ok || res.status === 201) {
+                alert("បានរក្សាទុក Location ថ្មីជោគជ័យ!");[cite: 13]
                 
-                // ហៅកត់ត្រាចូល Activity Log[cite: 12]
+                // 🟢 ហៅកត់ត្រាចូល Activity Log ពេលបង្កើត Location ថ្មីបានជោគជ័យ[cite: 13]
                 await logUserActivity("ADD_LOCATION", "YARD_LOCATION", "", `Added new location code: ${location_code}, Block: ${yard_block}`);
 
                 document.getElementById('locationForm').reset();
                 document.getElementById('location_code').focus();
-                loadLocations();[cite: 12]
+                loadLocations(); // Refresh Table[cite: 13]
             } else {
                 alert("កំហុស៖ " + (data.message || "មិនអាចរក្សាទុកបានទេ"));
             }
