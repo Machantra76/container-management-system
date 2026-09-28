@@ -231,7 +231,7 @@
         }
 
         try {
-            let url = `${API_BASE}/api/containers?from_date=${fromDate}&to_date=${toDate}`;
+            let url = `${API_BASE}/api/containers`;
             let res = await fetch(url);
             let json = await res.json();
 
@@ -239,38 +239,47 @@
             tbody.innerHTML = "";
             let rCount = 0;
 
-            if (json.data && Array.isArray(json.data)) {
-                json.data.forEach((item) => {
-                    // ត្រងទិន្នន័យបន្ថែមតាម Size (20, 40, 45) ប្រសិនបើបានជ្រើសរើស
-                    if (sizeFilter && String(item.size).trim() !== sizeFilter) {
-                        return;
-                    }
+            // ទាញយកបញ្ជីរាយទិន្នន័យ (គាំទ្រទាំងទម្រង់ json.data ឬ json សុទ្ធ)
+            let items = Array.isArray(json) ? json : (json.data || []);
 
-                    rCount++;
-                    let tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${rCount}</td>
-                        <td>${item.container_no || ''}</td>
-                        <td>${item.date_in || ''}</td>
-                        <td>${item.date_out || ''}</td>
-                        <td>${item.size || ''}</td>
-                        <td>${item.type || ''}</td>
-                        <td>${item.shipping_line || ''}</td>
-                        <td><b>${item.status || ''}</b></td>
-                        <td>${item.vessel_voy || ''}</td>
-                        <td>${item.booking_no || ''}</td>
-                        <td>${item.remark || ''}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+            items.forEach((item) => {
+                let dateInStr = item.date_in ? item.date_in.split('T')[0].split(' ')[0] : '';
+
+                // ប្រៀបធៀបចន្លោះកាលបរិច្ឆេទ (From Date -> To Date)
+                if (dateInStr) {
+                    if (dateInStr >= fromDate && dateInStr <= toDate) {
+                        
+                        // ត្រងតាម Size បន្ថែមបើមានការជ្រើសរើស
+                        if (sizeFilter && String(item.size).trim() !== sizeFilter) {
+                            return;
+                        }
+
+                        rCount++;
+                        let tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${rCount}</td>
+                            <td>${item.container_no || ''}</td>
+                            <td>${item.date_in || ''}</td>
+                            <td>${item.date_out || ''}</td>
+                            <td>${item.size || ''}</td>
+                            <td>${item.type || ''}</td>
+                            <td>${item.shipping_line || ''}</td>
+                            <td><b>${item.status || ''}</b></td>
+                            <td>${item.vessel_voy || ''}</td>
+                            <td>${item.booking_no || ''}</td>
+                            <td>${item.remark || ''}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                }
+            });
 
             document.getElementById('txtTotal').innerText = rCount;
             
             await logUserActivity("SEARCH_DATE", "CONTAINER_DATE_IN", "", `Searched containers from ${fromDate} to ${toDate} (Size: ${sizeFilter || 'All'}), found ${rCount} records`);
 
             if (rCount > 0) {
-                alert(`Data loaded successfully! Total: ${rCount} containers.`);
+                // រកឃើញទិន្នន័យ មិនបាច់เด้ង Alert រំខានទេ ព្រោះតារាងបានបង្ហាញស្រាប់
             } else {
                 alert("No data found for the selected criteria!");
             }
