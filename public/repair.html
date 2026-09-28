@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTAINER REPAIR</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #eef2f5; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .form-container { 
+            background: #ffffff; 
+            width: 100%;
+            max-width: 850px;
+            padding: 30px; 
+            border-radius: 6px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+            border: 2px solid #b22222;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #b22222;
+            color: white;
+            padding: 8px 15px;
+            margin: -30px -30px 25px -30px;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            font-weight: bold;
+        }
+        .window-controls span {
+            margin-left: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 30px;
+            margin-bottom: 25px;
+        }
+
+        .form-group { 
+            margin-bottom: 10px; 
+        }
+
+        .form-group label { 
+            display: block; 
+            margin-bottom: 4px; 
+            color: #222; 
+            font-weight: bold; 
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 7px 10px; 
+            border: 1px solid #7f9db9; 
+            border-radius: 2px; 
+            font-size: 13px; 
+            outline: none;
+            background-color: #fff;
+        }
+        .form-group textarea {
+            resize: vertical;
+            height: 50px;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #0078d7;
+            box-shadow: 0 0 3px rgba(0,120,215,0.5);
+        }
+
+        .input-group-dollar {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-group-dollar span {
+            position: absolute;
+            left: 10px;
+            font-weight: bold;
+            color: #555;
+            font-size: 13px;
+        }
+        .input-group-dollar input {
+            padding-left: 25px !important;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .btn { 
+            padding: 8px 35px; 
+            border: 1px solid #7f9db9; 
+            border-radius: 3px; 
+            font-size: 14px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            background: #e1dfdd;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn:hover { background: #c8c6c4; }
+        .btn-save { background: #007bff; color: white; border-color: #0056b3; }
+        .btn-save:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="top-bar">
+        <span>🗔 CONTAINER REPAIR</span>
+        <div class="window-controls">
+            <span onclick="window.location.href='/dashboard.html'">✕</span>
+        </div>
+    </div>
+    
+    <form id="repairForm">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="txtContainerNo">CONTAINER NO</label>
+                <select id="txtContainerNo" onchange="onContainerSelect()">
+                    <option value="">-- Select Container --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="txtType">TYPE</label>
+                <input type="text" id="txtType" readonly style="background-color: #e9ecef;">
+            </div>
+
+            <div class="form-group">
+                <label for="cmbRepairStatus">REPAIR_STATUS</label>
+                <select id="cmbRepairStatus">
+                    <option value="Pending">Pending</option>
+                    <option value="Inrepairing">Inrepairing</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="txtSize">SIZE</label>
+                <input type="text" id="txtSize" readonly style="background-color: #e9ecef;">
+            </div>
+
+            <div class="form-group">
+                <label for="txtVender">VENDER</label>
+                <input type="text" id="txtVender" autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="txtShippingLine">SHIPPING LINE</label>
+                <input type="text" id="txtShippingLine" readonly style="background-color: #e9ecef;">
+            </div>
+
+            <div class="form-group">
+                <label for="txtActCost">ACT_COST</label>
+                <div class="input-group-dollar">
+                    <span>$</span>
+                    <input type="number" step="any" id="txtActCost" autocomplete="off" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="txtDamageType">DAMAGE_TYPE</label>
+                <input type="text" id="txtDamageType" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="txtEstCost">EST_COST</label>
+                <div class="input-group-dollar">
+                    <span>$</span>
+                    <input type="number" step="any" id="txtEstCost" autocomplete="off" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="txtDamageDis">DAMAGE_DISCRIPTION</label>
+                <textarea id="txtDamageDis"></textarea>
+            </div>
+
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="txtRemark">REMARK</label>
+                <input type="text" id="txtRemark" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-save">Save</button>
+            <button type="button" class="btn" onclick="window.location.href='/dashboard.html'">CLOSE</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const API_BASE = "https://my-accesses-api.onrender.com";
+    let containersData = [];
+
+    window.onload = () => {
+        loadCloudContainers();
+        clearForm();
+    };
+
+    async function logUserActivity(action, module, containerNo, description) {
+        let userName = localStorage.getItem("currentUser") || localStorage.getItem("username") || "System";
+        let fullName = localStorage.getItem("currentUserFullName") || localStorage.getItem("userFullName") || userName;
+
+        try {
+            await fetch(`${API_BASE}/api/activity-log`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_name: userName,
+                    full_name: fullName,
+                    action: action,
+                    module: module,
+                    container_no: containerNo,
+                    description: description
+                })
+            });
+        } catch (err) {
+            console.error("Failed to log activity:", err);
+        }
+    }
+
+    async function loadCloudContainers() {
+        try {
+            let res = await fetch(`${API_BASE}/api/containers`);
+            let json = await res.json();
+            let select = document.getElementById('txtContainerNo');
+            select.innerHTML = '<option value="">-- Select Container --</option>';
+
+            if (json.data && Array.isArray(json.data)) {
+                containersData = json.data;
+                containersData.forEach(item => {
+                    let cNo = item.container_no || item.CONTAINER_No || '';
+                    if (cNo) {
+                        let opt = document.createElement('option');
+                        opt.value = cNo;
+                        opt.textContent = cNo;
+                        select.appendChild(opt);
+                    }
+                });
+            }
+        } catch (err) {
+            console.error("Error loading containers:", err);
+        }
+    }
+
+    // 🟢 លក្ខខណ្ឌទី១៖ ឆែកមើលពេលជ្រើសរើសលេខទូ បើសិនជា Release មិនឱ្យចូល Repair ទេ
+    function onContainerSelect() {
+        let selectedNo = document.getElementById('txtContainerNo').value;
+        if (!selectedNo) {
+            clearFormFieldsOnly();
+            return;
+        }
+
+        let found = containersData.find(item => (item.container_no || item.CONTAINER_No) === selectedNo);
+
+        if (found) {
+            let status = (found.status || found.STATUS || "").trim().toUpperCase();
+            if (status === "RELEASE") {
+                alert(`❌ មិនអាចជ្រើសរើសបានទេ! លេខកុងតឺន័រ "${selectedNo}" នេះបានជាប់ស្ថានភាព RELEASE រួចរាល់ហើយ។`);
+                document.getElementById('txtContainerNo').value = ""; // Clear selection
+                clearFormFieldsOnly();
+                return;
+            }
+
+            document.getElementById('txtType').value = found.type || found.TYPE || '';
+            document.getElementById('txtSize').value = found.size || found.SIZE || '';
+            document.getElementById('txtShippingLine').value = found.shipping_line || found.SHIPPING_LINE || '';
+        }
+    }
+
+    function clearFormFieldsOnly() {
+        document.getElementById('txtType').value = "";
+        document.getElementById('txtSize').value = "";
+        document.getElementById('txtShippingLine').value = "";
+    }
+
+    function clearForm() {
+        document.getElementById('txtContainerNo').value = "";
+        clearFormFieldsOnly();
+        document.getElementById('cmbRepairStatus').value = "Pending";
+        document.getElementById('txtVender').value = "";
+        document.getElementById('txtActCost').value = "0";
+        document.getElementById('txtEstCost').value = "0";
+        document.getElementById('txtDamageType').value = "";
+        document.getElementById('txtDamageDis').value = "";
+        document.getElementById('txtRemark').value = "";
+    }
+
+    function calculateDaysInRepair(startDateStr) {
+        if (!startDateStr) return 0;
+        let startDate = new Date(startDateStr);
+        let currentDate = new Date();
+        let diffTime = currentDate - startDate;
+        let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays >= 0 ? diffDays : 0;
+    }
+
+    // 🟢 លក្ខខណ្ឌទី២៖ តម្រូវឱ្យបំពេញ Text/Inputs ទាំងអស់ក្នុង Form Repair ឱ្យអស់ មុនពេល Save
+    document.getElementById('repairForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        let containerNo = document.getElementById('txtContainerNo').value.trim();
+        let repairStatus = document.getElementById('cmbRepairStatus').value.trim();
+        let vendor = document.getElementById('txtVender').value.trim();
+        let actCost = document.getElementById('txtActCost').value.trim();
+        let estCost = document.getElementById('txtEstCost').value.trim();
+        let damageType = document.getElementById('txtDamageType').value.trim();
+        let damageDesc = document.getElementById('txtDamageDis').value.trim();
+        let remark = document.getElementById('txtRemark').value.trim();
+
+        // ត្រួតពិនិត្យក្រែងលោមាន Field ណាមួយនៅទទេ
+        if (!containerNo || !repairStatus || !vendor || actCost === "" || estCost === "" || !damageType || !damageDesc || !remark) {
+            alert("⚠️ សូមបំពេញព័ត៌មានទាំងអស់នៅក្នុង Form Repair ឱ្យបានគ្រប់គ្រាន់ មិនត្រូវឱ្យមានការខ្វះចន្លោះឡើយ!");
+            return;
+        }
+
+        let foundContainer = containersData.find(item => (item.container_no || item.CONTAINER_No) === containerNo);
+        if (foundContainer) {
+            let status = (foundContainer.status || foundContainer.STATUS || "").trim().toUpperCase();
+            if (status === "RELEASE") {
+                alert(`❌ បរាជ័យ! លេខកុងតឺន័រ "${containerNo}" នេះជាប់ស្ថានភាព RELEASE មិនអាចកត់ត្រាការជួសជុលបានទេ។`);
+                return;
+            }
+
+            let currentCheckRepair = foundContainer.check_repair || foundContainer.checkRepair || "";
+            if (currentCheckRepair === "UnderRepair") {
+                alert(`⚠️ អាសន្ន! លេខ Container "${containerNo}" នេះកំពុងស្ថិតក្នុងស្ថានភាពជួសជុល (UnderRepair) រួចស្រេចហើយ មិនអាចបញ្ចូលស្ទួនបានទេ។`);
+                return;
+            }
+        }
+
+        let shippingLine = document.getElementById('txtShippingLine').value;
+        let size = document.getElementById('txtSize').value;
+        let type = document.getElementById('txtType').value;
+        let repairDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+        let calculatedDays = calculateDaysInRepair(repairDate);
+
+        try {
+            let resRepair = await fetch(`${API_BASE}/api/container-repairs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    container_no: containerNo,
+                    repair_date_in_time: repairDate,
+                    shipping_line: shippingLine,
+                    size: size,
+                    type: type,
+                    day_in_repair: calculatedDays.toString(),
+                    repair_status: repairStatus,
+                    vessel_voy: "",
+                    check_repair: "UnderRepair",
+                    damage_type: damageType,
+                    damage_discription: damageDesc,
+                    vender: vendor,
+                    est_cost: parseFloat(estCost) || 0,
+                    act_cost: parseFloat(actCost) || 0,
+                    remark: remark
+                })
+            });
+
+            await fetch(`${API_BASE}/api/containers/${encodeURIComponent(containerNo)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    check_repair: "UnderRepair",
+                    checkRepair: "UnderRepair"
+                })
+            });
+
+            await logUserActivity("ADD_REPAIR", "CONTAINER_REPAIR", containerNo, "Added repair record for " + containerNo);
+
+            if (resRepair.ok || resRepair.status === 201 || resRepair.status === 200) {
+                alert("Saved successfully and synced to Cloud API!");
+                clearForm();
+                loadCloudContainers();
+            } else {
+                alert("Failed to save repair record to Cloud.");
+            }
+
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Connection Error: " + err.message);
+        }
+    });
+</script>
+
+</body>
+</html>
