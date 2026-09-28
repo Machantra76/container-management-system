@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYSTEM DASHBOARD & ANALYTICS</title>
-    <!-- ដាក់បញ្ចូល Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -40,7 +39,6 @@
         }
         .back-link:hover { text-decoration: underline; }
 
-        /* Cards Grid */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -72,7 +70,6 @@
             margin-top: 5px;
         }
 
-        /* ផ្នែក Summary Tables តាម Size និង Shipping Line */
         .summary-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -108,7 +105,6 @@
         }
         tbody tr:nth-child(even) { background-color: #fff; }
 
-        /* Charts Grid */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
@@ -139,7 +135,6 @@
         <a href="dashboard.html" class="back-link">← ត្រឡប់ទៅ Main Menu</a>
     </div>
 
-    <!-- ផ្នែក Card សង្ខេបទិន្នន័យ Container -->
     <div class="cards-grid">
         <div class="card">
             <div class="title">Total In Yard</div>
@@ -159,7 +154,6 @@
         </div>
     </div>
 
-    <!-- ផ្នែកតារាងបង្ហាញលម្អិតតាម Size និង Shipping Line -->
     <div class="summary-grid">
         <div class="table-box">
             <h3>📦 Container In Yard (តាម Size និង Shipping Line)</h3>
@@ -198,7 +192,6 @@
         </div>
     </div>
 
-    <!-- ផ្នែកក្រាហ្វ (Charts) -->
     <div class="charts-grid">
         <div class="chart-container">
             <h3>សកម្មភាពប្រព័ន្ធតាមប្រភេទ (Action Breakdown)</h3>
@@ -212,7 +205,7 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    const API_BASE = window.location.origin;
 
     window.onload = async () => {
         await loadDashboardData();
@@ -236,7 +229,6 @@
             let repairRes = await resRepairReport.json();
             let repairs = Array.isArray(repairRes) ? repairRes : (repairRes.data || []);
 
-            // បង្ហាញតម្លៃសរុបទៅក្នុង Cards
             let lblUsers = document.getElementById('lblTotalUsers');
             if (lblUsers) lblUsers.innerText = users.length;
             
@@ -255,10 +247,7 @@
             let lblRepair = document.getElementById('lblTotalRepair');
             if (lblRepair) lblRepair.innerText = repairs.length;
 
-            // បំពេញតារាងលម្អិតតាម Size និង Shipping Line
             populateTables(stockIn, repairs);
-
-            // រៀបចំក្រាហ្វទំនើប
             processCharts(logs, stockIn);
 
         } catch (err) {
@@ -327,14 +316,13 @@
             sizeCounts[size] = (sizeCounts[size] || 0) + 1;
         });
 
-        // បញ្ជីពណ៌ទំនើបៗសម្រាប់របារក្រាហ្វ (Modern Color Palette)
         const modernColors = [
-            'rgba(54, 162, 235, 0.8)',   // Blue
-            'rgba(75, 192, 192, 0.8)',   // Teal
-            'rgba(255, 159, 64, 0.8)',   // Orange
-            'rgba(153, 102, 255, 0.8)',  // Purple
-            'rgba(255, 99, 132, 0.8)',   // Pink/Red
-            'rgba(255, 206, 86, 0.8)'    // Yellow
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(255, 206, 86, 0.8)'
         ];
         
         const modernBorders = [
@@ -346,7 +334,6 @@
             'rgba(255, 206, 86, 1)'
         ];
 
-        // 1. Modern Bar Chart (Action Breakdown)
         const ctxActionEl = document.getElementById('actionChart');
         if (ctxActionEl) {
             const ctxAction = ctxActionEl.getContext('2d');
@@ -360,36 +347,28 @@
                         backgroundColor: modernColors,
                         borderColor: modernBorders,
                         borderWidth: 2,
-                        borderRadius: 6, // ធ្វើឱ្យគែមរបារខាងលើកោងស្អាត
+                        borderRadius: 6,
                         barPercentage: 0.6
                     }]
                 },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false } // បិទ Legend ព្រោះពណ៌ដាច់ដោយឡែកពីគ្នាស្រាប់
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
         }
 
-        // 2. Modern Doughnut Chart (Size Breakdown)
         const ctxSizeEl = document.getElementById('sizeChart');
         if (ctxSizeEl) {
             const ctxSize = ctxSizeEl.getContext('2d');
             const sizeKeys = Object.keys(sizeCounts);
             new Chart(ctxSize, {
-                type: 'doughnut', // ប្តូរពី Pie ធម្មតា មកជា Doughnut មានរង្វង់ប្រហោងកណ្តាលទាន់សម័យ
+                type: 'doughnut',
                 data: {
                     labels: sizeKeys.length > 0 ? sizeKeys : ['20FT', '40FT'],
                     datasets: [{
@@ -403,15 +382,9 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
-                    cutout: '65%', // ទំហំរង្វង់ប្រហោងកណ្តាល
+                    cutout: '65%',
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 15,
-                                font: { size: 12 }
-                            }
-                        }
+                        legend: { position: 'bottom', labels: { boxWidth: 15, font: { size: 12 } } }
                     }
                 }
             });
