@@ -237,7 +237,8 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 8]
+    const API_BASE = window.location.origin;
 
     window.onload = function() {
         let currentRole = (localStorage.getItem("currentUserRole") || localStorage.getItem("role") || "User").trim().toLowerCase();
