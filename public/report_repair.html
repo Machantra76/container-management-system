@@ -325,7 +325,8 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // ប្រើប្រាស់ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 8]
+    const API_BASE = window.location.origin;
     let rawRepairList = [];
     let currentFilteredList = [];
     let selectedRowData = null;
@@ -333,16 +334,14 @@
 
     window.onload = function() {
         loadContainerRepairData();
-        applyShippingRoleRestrictions(); // 🟢 ពិនិត្យសិទ្ធិ Role ពេលផ្ទុកទំព័រ
+        applyShippingRoleRestrictions();
     };
 
-    // 🟢 មុខងារត្រួតពិនិត្យសិទ្ធិសម្រាប់ Role = shipping_line
     function applyShippingRoleRestrictions() {
         let currentRole = (localStorage.getItem("currentUserRole") || "").trim().toLowerCase();
         let currentShippingLineUser = localStorage.getItem("currentShippingLine") || localStorage.getItem("currentUser") || "";
 
         if (currentRole === "shipping_line" || currentRole === "shipping") {
-            // ១. បិទប៊ូតុង COMPLETE
             let btnComplete = document.getElementById('btnComplete');
             if (btnComplete) {
                 btnComplete.disabled = true;
@@ -351,7 +350,6 @@
                 btnComplete.title = "Restricted for Shipping Line role";
             }
 
-            // ២. បិទប៊ូតុង EDIT STATUS
             let btnEditStatus = document.getElementById('btnEditStatus');
             if (btnEditStatus) {
                 btnEditStatus.disabled = true;
@@ -360,7 +358,6 @@
                 btnEditStatus.title = "Restricted for Shipping Line role";
             }
 
-            // ៣. បិទប៊ូតុង DELETE
             let btnDelete = document.getElementById('btnDelete');
             if (btnDelete) {
                 btnDelete.disabled = true;
@@ -369,13 +366,12 @@
                 btnDelete.title = "Restricted for Shipping Line role";
             }
 
-            // ៤. លាក់ ឬล็อក Dropdown Shipping Line តាមគណនីផ្ទាល់ខ្លួនបើសمស្រប
             let ddlLine = document.getElementById('ddlShippingLine');
             if (currentShippingLineUser && currentShippingLineUser !== "Admin" && ddlLine) {
                 for (let opt of ddlLine.options) {
                     if (opt.value.toUpperCase() === currentShippingLineUser.toUpperCase()) {
                         ddlLine.value = opt.value;
-                        ddlLine.disabled = true; // ล็อកមិនឱ្យដូរមើលរបស់ក្រុមហ៊ុនដទៃ
+                        ddlLine.disabled = true;
                         filterContainerData();
                         break;
                     }
@@ -868,7 +864,7 @@
             }
         } catch (err) {
             console.error("Error deleting repair record:", err);
-            alert("មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server: " + err.message);
+            alert("មានបញ្ហាក្នុងการភ្ជាប់ទៅកាន់ Server: " + err.message);
         }
     }
 
