@@ -147,8 +147,8 @@
 </div>
 
 <script>
-    // 🔴 1. ជំនួស Link ខាងក្រោមនេះ ជាមួយ Link API របស់ Database ថ្មីរបស់អ្នក
-    const API_BASE = "https://YOUR-NEW-RENDER-API.onrender.com";
+    // ប្រើប្រាស់ window.location.origin ស្វ័យប្រវត្តិដើម្បីជៀសវាងបញ្ហា Failed to fetch
+    const API_BASE = window.location.origin;
 
     // មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log
     async function logUserActivity(action, module, containerNo, description) {
