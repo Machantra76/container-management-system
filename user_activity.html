@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USER ACTIVITY LOG</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #eef2f5; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #b22222;
+            color: white;
+            padding: 10px 20px;
+            margin: -25px -25px 20px -25px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* ផ្នែក Search & Header Illustration */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .search-box {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            font-size: 11px;
+            color: #444;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+        .control-group input {
+            width: 200px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .btn {
+            padding: 8px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            height: 35px;
+        }
+        .btn:hover { background: #0056b3; }
+        .btn-close { background: #6c757d; }
+        .btn-close:hover { background: #5a6268; }
+
+        .header-img img {
+            height: 70px;
+            object-fit: contain;
+        }
+
+        /* តារាងបង្ហាញទិន្នន័យ */
+        .table-responsive {
+            overflow-x: auto;
+            max-height: 550px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #343a40;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        tbody tr:hover { background-color: #e2e6ea; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-bar">
+        <h2 style="margin:0; font-size:18px;">ACTIVITY_LOG - USER ACTIVITY</h2>
+        <a href="/dashboard.html" class="back-link">← ត្រឡប់ទៅ Main Menu</a>
+    </div>
+
+    <!-- ផ្នែក Search User Name, Search Date និង រូបភាព Illustration -->
+    <div class="header-section">
+        <div class="search-box">
+            <div class="control-group">
+                <label>SEARCH USER NAME</label>
+                <input type="text" id="txtUserName" placeholder="បញ្ចូលឈ្មោះ User..." onkeyup="handleKeySearch(event)">
+            </div>
+            
+            <!-- 🟢 បន្ថែម Input សម្រាប់ Search Date -->
+            <div class="control-group">
+                <label>SEARCH DATE</label>
+                <input type="date" id="txtSearchDate" onchange="searchLogs()">
+            </div>
+
+            <button class="btn" onclick="searchLogs()">SEARCH</button>
+            <button class="btn btn-close" onclick="window.location.href='/dashboard.html'">CLOSE</button>
+        </div>
+        <div class="header-img">
+            <!-- 🟢 ដាក់បញ្ចូលរូបភាពតាមសំណើ -->
+            <img src="https://cdn-icons-png.flaticon.com/512/2881/2881804.png" alt="Activity Log Illustration">
+        </div>
+    </div>
+
+    <!-- តារាងបង្ហាញទិន្នន័យ Activity Logs -->
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>DATE/TIME</th>
+                    <th>USER NAME</th>
+                    <th>FULL NAME</th>
+                    <th>ACTION</th>
+                    <th>MODULE</th>
+                    <th>CONTAINER No</th>
+                    <th>DESCRIPTION</th>
+                </tr>
+            </thead>
+            <tbody id="activityTableBody">
+                <!-- ទិន្នន័យនឹងត្រូវទាញមកដាក់ទីនេះស្វ័យប្រវត្តិ -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "https://my-accesses-api.onrender.com";
+
+    // 🟢 មុខងារសម្រាប់កត់ត្រាសកម្មភាពចូល Activity Log
+    async function logUserActivity(action, module, containerNo, description) {
+        let userName = localStorage.getItem("currentUser") || "System";
+        let fullName = localStorage.getItem("currentUserFullName") || userName;
+
+        try {
+            await fetch(`${API_BASE}/api/activity-log`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_name: userName,
+                    full_name: fullName,
+                    action: action,
+                    module: module,
+                    container_no: containerNo,
+                    description: description
+                })
+            });
+        } catch (err) {
+            console.error("Failed to log activity:", err);
+        }
+    }
+
+    window.onload = () => {
+        loadActivityLogs("", "");
+    };
+
+    // មុខងារ Fetch Activity Logs ពី Cloud API (គាំទ្រការ Filter ទាំង User Name និង Date) 
+    async function loadActivityLogs(userNameFilter = "", dateFilter = "") {
+        try {
+            let url = `${API_BASE}/api/activity-log`;
+            let params = [];
+
+            if (userNameFilter) {
+                params.push(`user_name=${encodeURIComponent(userNameFilter)}`);
+            }
+            if (dateFilter) {
+                params.push(`date=${encodeURIComponent(dateFilter)}`);
+            }
+
+            if (params.length > 0) {
+                url += `?${params.join('&')}`;
+            }
+
+            let res = await fetch(url);
+            let json = await res.json();
+
+            let tbody = document.getElementById('activityTableBody');
+            tbody.innerHTML = "";
+            let rCount = 0;
+
+            let logsArray = [];
+            if (Array.isArray(json)) {
+                logsArray = json;
+            } else if (json.data && Array.isArray(json.data)) {
+                logsArray = json.data;
+            }
+
+            // ប្រសិនបើ API មិនទាន់รองรับ Filter ថ្ងៃខែតាម Server យើងអាច Filter បន្ថែមនៅខាង Client ផ្ទាល់បាន
+            if (dateFilter) {
+                logsArray = logsArray.filter(item => {
+                    let itemDate = (item.date_time || item.DATE_TIME || "").substring(0, 10);
+                    return itemDate === dateFilter;
+                });
+            }
+
+            if (logsArray.length > 0) {
+                logsArray.forEach((item) => {
+                    rCount++;
+                    let tr = document.createElement('tr');
+                    
+                    let dateTime = item.date_time || item.DATE_TIME || '';
+                    let userName = item.user_name || item.USER_NAME || '';
+                    let fullName = item.full_name || item.fullname || item.FULL_NAME || '';
+                    let action = item.action || item.ACTION || '';
+                    let moduleName = item.module || item.MODULE || '';
+                    let containerNo = item.container_no || item.CONTAINER_NO || '';
+                    let desc = item.description || item.discription || item.DESCRIPTION || '';
+
+                    tr.innerHTML = `
+                        <td>${rCount}</td>
+                        <td>${dateTime}</td>
+                        <td><b>${userName}</b></td>
+                        <td>${fullName}</td>
+                        <td><span style="color: #0056b3; font-weight: bold;">${action}</span></td>
+                        <td>${moduleName}</td>
+                        <td>${containerNo}</td>
+                        <td>${desc}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            if (rCount === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: #666; padding: 20px;">រកមិនឃើញទិន្នន័យ Activity Logs ទេ!</td></tr>`;
+            }
+
+        } catch (err) {
+            console.error("Error loading activity logs:", err);
+            alert("មានបញ្ហាក្នុងការតភ្ជាប់ទៅកាន់ Cloud Server!");
+        }
+    }
+
+    async function searchLogs() {
+        let userName = document.getElementById('txtUserName').value.trim();
+        let searchDate = document.getElementById('txtSearchDate').value;
+        
+        loadActivityLogs(userName, searchDate);
+
+        // 🟢 កត់ត្រាចូល Activity Log ពេលធ្វើការស្វែងរក
+        await logUserActivity("SEARCH_LOG", "USER_ACTIVITY_LOG", "", `Searched activity logs for username: ${userName || "All"}, Date: ${searchDate || "All"}`);
+    }
+
+    function handleKeySearch(event) {
+        if (event.key === "Enter") {
+            searchLogs();
+        }
+    }
+</script>
+
+</body>
+</html>
