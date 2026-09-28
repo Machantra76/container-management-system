@@ -97,7 +97,7 @@
             padding-top: 20px;
         }
         .btn {
-            padding: 8px 25px;
+            padding: 8px 30px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
@@ -106,17 +106,14 @@
             background: #f8f9fa;
             transition: background 0.2s;
         }
-        .btn-save { background: #28a745; color: white; border-color: #218838; }
-        .btn-save:hover { background: #218838; }
+        .btn-save { background: #e2e6ea; border-color: #adb5bd; }
+        .btn-save:hover { background: #d4edda; border-color: #c3e6cb; }
         
-        .btn-add { background: #ffc107; color: #333; border-color: #e0a800; }
-        .btn-add:hover { background: #e0a800; }
+        .btn-add { background: #e2e6ea; border-color: #adb5bd; }
+        .btn-add:hover { background: #fff3cd; border-color: #ffeeba; }
 
-        .btn-admin { background: #007bff; color: white; border-color: #0056b3; }
-        .btn-admin:hover { background: #0056b3; }
-
-        .btn-close { background: #6c757d; color: white; border-color: #5a6268; }
-        .btn-close:hover { background: #5a6268; }
+        .btn-close { background: #e2e6ea; border-color: #adb5bd; }
+        .btn-close:hover { background: #f8d7da; border-color: #f5c6cb; }
     </style>
 </head>
 <body>
@@ -140,30 +137,29 @@
 
         <div class="form-group">
             <label for="txtUserName">USER_NAME</label>
-            <input type="text" id="txtUserName" required autocomplete="off" placeholder="ឧ. admin ឬ username">
+            <input type="text" id="txtUserName" required autocomplete="off">
         </div>
 
         <div class="form-group">
-            <label for="txtPassworld">PASSWORD</label>
-            <input type="password" id="txtPassworld" required autocomplete="off" placeholder="បញ្ចូលពាក្យសម្ងាត់...">
+            <label for="txtPassworld">PASSWORLD</label>
+            <input type="password" id="txtPassworld" required autocomplete="off">
         </div>
 
         <div class="form-group">
             <label for="txtFullName">FULL_NAME</label>
-            <input type="text" id="txtFullName" autocomplete="off" placeholder="ឈ្មោះពេញ...">
+            <input type="text" id="txtFullName" autocomplete="off">
         </div>
 
         <div class="form-group">
             <label for="cmbRole">ROLE</label>
             <select id="cmbRole" onchange="toggleShippingLineField()">
-                <option value="Admin">Admin</option>
                 <option value="Operation">Operation</option>
+                <option value="Admin">Admin</option>
                 <option value="Supervisor">Supervisor</option>
                 <option value="shipping_line">Shipping Line</option>
             </select>
         </div>
 
-        <!-- ប្រអប់បញ្ជាក់ឈ្មោះ Shipping Line (បង្ហាញពេលជ្រើសរើស Role ជា Shipping Line) -->
         <div class="form-group" id="shippingLineGroup" style="display: none;">
             <label for="txtShippingLine">SHIPPING LINE</label>
             <input type="text" id="txtShippingLine" placeholder="ឧ. HMM, SITC, MSC..." autocomplete="off">
@@ -185,14 +181,14 @@
         <div class="button-group">
             <button type="submit" class="btn btn-save">SAVE</button>
             <button type="button" class="btn btn-add" onclick="addNewUser()">Add New</button>
-            <button type="button" class="btn btn-admin" onclick="fillAdminDefault()">Quick Admin</button>
             <button type="button" class="btn btn-close" onclick="window.location.href='/dashboard.html'">CLOSE</button>
         </div>
     </form>
 </div>
 
 <script>
-    const API_BASE = window.location.origin;
+    // 🟢 កែសម្រួលឱ្យប្រើ window.location.origin ជំនួស URL ចាស់ ដើម្បីការពារការច្រឡំ Service
+    const API_BASE = window.location.origin;[cite: 19]
 
     async function logUserActivity(action, module, containerNo, description) {
         let userName = localStorage.getItem("currentUser") || "System";
@@ -218,8 +214,6 @@
 
     window.onload = () => {
         clearFields();
-        // កំណត់ Role ដើមឱ្យទៅជា Admin ស្រាប់ដើម្បីងាយស្រួលបង្កើត Admin ដំបូង
-        document.getElementById('cmbRole').value = "Admin";
     };
 
     function toggleShippingLineField() {
@@ -237,23 +231,12 @@
         }
     }
 
-    // មុខងារបំពេញទិន្នន័យ Admin ស្វ័យប្រវត្តិដើម្បីភាពងាយស្រួល
-    function fillAdminDefault() {
-        document.getElementById('txtUserName').value = "admin";
-        document.getElementById('txtPassworld').value = "admin123";
-        document.getElementById('txtFullName').value = "System Administrator";
-        document.getElementById('cmbRole').value = "Admin";
-        document.getElementById('cmbActive').value = "Active";
-        toggleShippingLineField();
-        alert("បានបំពេញព័ត៌មាន Admin រួចរាល់! សូមចុចប៊ូតុង SAVE ជាការស្រេច។");
-    }
-
     function clearFields() {
         document.getElementById('txtUserId').value = "(Auto)";
         document.getElementById('txtUserName').value = "";
         document.getElementById('txtPassworld').value = "";
         document.getElementById('txtFullName').value = "";
-        document.getElementById('cmbRole').value = "Admin";
+        document.getElementById('cmbRole').value = "Operation";
         document.getElementById('txtShippingLine').value = "";
         document.getElementById('shippingLineGroup').style.display = "none";
         document.getElementById('cmbActive').value = "Active";
@@ -265,7 +248,6 @@
         clearFields();
     }
 
-    // ព្រឹត្តិការណ៍ពេលចុច SAVE (ផ្ញើទិន្នន័យទៅកាន់ Cloud API)
     document.getElementById('userForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -294,34 +276,31 @@
             return;
         }
 
-        let payload = {
-            username: strUser,
-            password: strPass,
-            role: strRole,
-            shipping_line: strShippingLine,
-            full_name: strFullName,
-            active: strActive
-        };
-
         try {
             let res = await fetch(`${API_BASE}/api/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({
+                    username: strUser,
+                    password: strPass,
+                    role: strRole,
+                    shipping_line: strShippingLine,
+                    full_name: strFullName,
+                    active: strActive
+                })
             });
 
-            let resultJson = await res.json().catch(() => ({}));
-
             if (res.status === 201 || res.status === 200 || res.ok) {
-                alert("Data saved to Cloud Database successfully!");
-                await logUserActivity("ADD_USER", "USER_MANAGEMENT", "", `Created new user account: ${strUser} (Role: ${strRole})`);
+                alert("Data saved to Cloud Database successfully!");[cite: 19]
+                await logUserActivity("ADD_USER", "USER_MANAGEMENT", "", `Created new user account: ${strUser} (Role: ${strRole}, Line: ${strShippingLine})`);
                 clearFields();
             } else {
-                alert("Failed to save to Cloud: " + (resultJson.message || resultJson.error || "Unknown error"));
+                let errText = await res.text();
+                alert("Failed to save to Cloud: " + errText);[cite: 19]
             }
         } catch (err) {
             console.error("Error saving user:", err);
-            alert("Connection Error: " + err.message);
+            alert("Connection Error: " + err.message);[cite: 19]
         }
     });
 </script>
