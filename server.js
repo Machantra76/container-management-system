@@ -11,29 +11,29 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // -------------------------------------------------------------
-// SERVE STATIC FILES FROM ROOT DIRECTORY
+// SERVE STATIC FILES FROM PUBLIC DIRECTORY
 // -------------------------------------------------------------
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // -------------------------------------------------------------
 // HTML PAGE ROUTES
 // -------------------------------------------------------------
-app.get('/stock_in.html', (req, res) => res.sendFile(path.join(__dirname, 'stock_in.html')));
-app.get('/repair.html', (req, res) => res.sendFile(path.join(__dirname, 'repair.html')));
-app.get('/shipping_line.html', (req, res) => res.sendFile(path.join(__dirname, 'shipping_line.html')));
-app.get('/date_in.html', (req, res) => res.sendFile(path.join(__dirname, 'date_in.html')));
-app.get('/report_repair.html', (req, res) => res.sendFile(path.join(__dirname, 'report_repair.html')));
-app.get('/shipping_line_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'shipping_line_manager.html')));
-app.get('/location_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'location_manager.html')));
-app.get('/user_activity.html', (req, res) => res.sendFile(path.join(__dirname, 'user_activity.html')));
-app.get('/user_management.html', (req, res) => res.sendFile(path.join(__dirname, 'user_management.html')));
-app.get('/user_report.html', (req, res) => res.sendFile(path.join(__dirname, 'user_report.html')));
-app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
-app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/stock_in.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'stock_in.html')));
+app.get('/repair.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'repair.html')));
+app.get('/shipping_line.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shipping_line.html')));
+app.get('/date_in.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'date_in.html')));
+app.get('/report_repair.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'report_repair.html')));
+app.get('/shipping_line_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shipping_line_manager.html')));
+app.get('/location_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'location_manager.html')));
+app.get('/user_activity.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user_activity.html')));
+app.get('/user_management.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user_management.html')));
+app.get('/user_report.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user_report.html')));
+app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
