@@ -11,29 +11,29 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // -------------------------------------------------------------
-// SERVE STATIC FILES FROM "PUBLIC" FOLDER
+// SERVE STATIC FILES FROM ROOT DIRECTORY
 // -------------------------------------------------------------
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+    res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 // -------------------------------------------------------------
 // HTML PAGE ROUTES
 // -------------------------------------------------------------
-app.get('/stock_in.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'stock_in.html')));
-app.get('/repair.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'repair.html')));
-app.get('/shipping_line.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shipping_line.html')));
-app.get('/date_in.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'date_in.html')));
-app.get('/report_repair.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'report_repair.html')));
-app.get('/shipping_line_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shipping_line_manager.html')));
-app.get('/location_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'location_manager.html')));
-app.get('/user_activity.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user_activity.html')));
-app.get('/user_management.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user_management.html')));
-app.get('/user_report.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'user_report.html')));
-app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
-app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/stock_in.html', (req, res) => res.sendFile(path.join(__dirname, 'stock_in.html')));
+app.get('/repair.html', (req, res) => res.sendFile(path.join(__dirname, 'repair.html')));
+app.get('/shipping_line.html', (req, res) => res.sendFile(path.join(__dirname, 'shipping_line.html')));
+app.get('/date_in.html', (req, res) => res.sendFile(path.join(__dirname, 'date_in.html')));
+app.get('/report_repair.html', (req, res) => res.sendFile(path.join(__dirname, 'report_repair.html')));
+app.get('/shipping_line_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'shipping_line_manager.html')));
+app.get('/location_manager.html', (req, res) => res.sendFile(path.join(__dirname, 'location_manager.html')));
+app.get('/user_activity.html', (req, res) => res.sendFile(path.join(__dirname, 'user_activity.html')));
+app.get('/user_management.html', (req, res) => res.sendFile(path.join(__dirname, 'user_management.html')));
+app.get('/user_report.html', (req, res) => res.sendFile(path.join(__dirname, 'user_report.html')));
+app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'dashboard.html')));
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -389,7 +389,6 @@ app.get('/api/containers', async (req, res) => {
     }
 });
 
-// DELETE CONTAINER STOCK ENDPOINT
 app.delete('/api/containers/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -413,7 +412,6 @@ app.put('/api/containers/edit-full', async (req, res) => {
             return res.status(404).json({ status: "Error", message: "Container not found" });
         }
 
-        // ១. អាប់ដេតតារាង container_stock
         const result = await pool.query(
             `UPDATE container_stock 
              SET container_no = $1, size = $2, type = $3, shipping_line = $4, vessel_voy = $5, booking_no = $6, remark = $7, location = $8 
@@ -421,7 +419,6 @@ app.put('/api/containers/edit-full', async (req, res) => {
             [container_no, size, type, shipping_line, vessel_voy, booking_no, remark, location, original_container_no]
         );
 
-        // ២. 🟢 ស៊ីនទិន្នន័យ (Sync) ទាំង container_no, size, type, shipping_line, vessel_voy ទៅកាន់តារាង container_repair ព្រមគ្នា
         await pool.query(
             `UPDATE container_repair 
              SET container_no = $1, size = $2, type = $3, shipping_line = $4, vessel_voy = $5 
@@ -453,7 +450,6 @@ app.put('/api/containers/update-repair-status', async (req, res) => {
     }
 });
 
-// 🟢 ថែម Endpoint សម្រាប់ទទួលការ Sync ពីទំព័រ Report Repair មក Shipping Line
 app.put('/api/containers/repair-complete', async (req, res) => {
     const { container_no, check_repair } = req.body;
     try {
@@ -700,7 +696,7 @@ app.get('/api/container-repairs-report', async (req, res) => {
 });
 
 // -------------------------------------------------------------
-// ACTIVITY LOG API ENDPOINTS (UPDATED WITH full_name SUPPORT)
+// ACTIVITY LOG API ENDPOINTS
 // -------------------------------------------------------------
 app.post('/api/activity-log', async (req, res) => {
     const { user_name, full_name, action, module, container_no, description } = req.body;
