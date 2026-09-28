@@ -377,7 +377,8 @@
 </div>
 
 <script>
-    const API_BASE = "https://my-accesses-api.onrender.com";
+    // ប្រើ window.location.origin ដើម្បីឱ្យវាដោះដូរ Domain ទៅតាម Web Service នីមួយៗដោយស្វ័យប្រវត្តិ[cite: 1, 2, 6]
+    const API_BASE = window.location.origin;
 
     let containerDataList = [];
     let shippingLineList = [];
@@ -392,16 +393,14 @@
         loadShippingLines();
         loadLocations();
         loadContainers();
-        applyShippingRoleRestrictions(); // 🟢 ពិនិត្យសិទ្ធិ User Role
+        applyShippingRoleRestrictions();
     };
 
-    // 🟢 មុខងារត្រួតពិនិត្យសិទ្ធិសម្រាប់ Role = shipping_line
     function applyShippingRoleRestrictions() {
         let currentRole = (localStorage.getItem("currentUserRole") || "").trim().toLowerCase();
         let currentShippingLineUser = localStorage.getItem("currentShippingLine") || localStorage.getItem("currentUser") || "";
 
         if (currentRole === "shipping_line" || currentRole === "shipping") {
-            // ១. បិទប៊ូតុង Release/Unrelease
             let btnRelease = document.getElementById('btnRelease');
             if (btnRelease) {
                 btnRelease.disabled = true;
@@ -410,7 +409,6 @@
                 btnRelease.title = "Restricted for Shipping Line role";
             }
 
-            // ២. បិទប៊ូតុង Edit Booking & Remark
             let btnEdit = document.getElementById('btnEditBooking');
             if (btnEdit) {
                 btnEdit.disabled = true;
@@ -419,14 +417,12 @@
                 btnEdit.title = "Restricted for Shipping Line role";
             }
 
-            // ៣. ប្រសិនបើមានការកំណត់ឈ្មោះ Shipping Line ជាប់នឹង Account ស្រាប់ ធ្វើការล็อค Filter តែម្តង
             let cmbLine = document.getElementById('cmbShippingLine');
             if (currentShippingLineUser && currentShippingLineUser !== "Admin" && cmbLine) {
-                // រកមើល option ស្មើនឹងឈ្មោះ user
                 for (let opt of cmbLine.options) {
                     if (opt.value.toUpperCase() === currentShippingLineUser.toUpperCase()) {
                         cmbLine.value = opt.value;
-                        cmbLine.disabled = true; // ล็อคមិនឱ្យដូរចេញពី Line ខ្លួនឯង
+                        cmbLine.disabled = true;
                         filterByShippingLine();
                         break;
                     }
@@ -489,7 +485,7 @@
                     modalSelect.appendChild(opt2);
                 });
             }
-            applyShippingRoleRestrictions(); // ហៅម្តងទៀតក្រោយពេល load ក្នុង select រួច
+            applyShippingRoleRestrictions();
         } catch (err) { console.error("Error loading shipping lines:", err); }
     }
 
@@ -578,7 +574,6 @@
             let tr = document.createElement('tr');
             tr.onclick = () => selectRow(tr, item.id, item.container_no, index);
 
-            // 🟢 បើជា Role shipping_line មិនឱ្យបង្ហាញប៊ូតុងកែតម្រូវ (Row Edit) ទេ
             let actionColumnContent = isShippingRole 
                 ? `<span style="color:#999; font-style:italic;">Restricted</span>` 
                 : `<button class="btn-row-edit" onclick="openEditModal(${index}); event.stopPropagation();">កែតំរូវ</button>`;
