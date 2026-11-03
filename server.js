@@ -39,6 +39,50 @@ const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
 });
+async function processPendingSchedules() {
+    try {
+        const result = await pool.query(
+            `SELECT * FROM scheduled_messages WHERE status = 'Pending' AND schedule_time <= NOW()`
+        );
+
+        const pendingTasks = result.rows;
+        if (pendingTasks.length === 0) return { count: 0, success: 0 };
+
+        let successCount = 0;
+        for (const item of pendingTasks) {
+            try {
+                await pool.query("UPDATE scheduled_messages SET status = 'Sent' WHERE id = $1", [item.id]);
+                successCount++;
+            } catch (err) {
+                console.error(`❌ [Schedule Error ID ${item.id}]:`, err.message);
+                await pool.query("UPDATE scheduled_messages SET status = $1 WHERE id = $2", [`Failed: ${err.message}`, item.id]);
+            }
+        }
+        return { count: pendingTasks.length, success: successCount };
+    } catch (err) {
+        console.error('❌ [processPendingSchedules Error]:', err.message);
+        return { count: 0, success: 0, error: err.message };
+    }
+}
+app.get('/api/run-cron', async (req, res) => {
+    try {
+        const nowUTC = new Date();
+        const localTimeStr = nowUTC.toLocaleString('en-GB', { timeZone: 'Asia/Phnom_Penh' });
+        
+        console.log(`⏰ [Cron Triggered] Server UTC Time: ${nowUTC.toISOString()}`);
+        console.log(`🇰🇭 [Cron Triggered] Local (Phnom Penh) Time: ${localTimeStr}`);
+
+        const result = await processPendingSchedules();
+        
+        res.json({ 
+            success: true, 
+            processedCount: result ? result.count : 0,
+            successCount: result ? result.success : 0
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
 
 // 🟢 មុខងារបង្កើត Admin ស្វ័យប្រវត្តិ
 async function createDefaultAdmin() {
